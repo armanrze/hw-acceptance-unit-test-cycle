@@ -3,9 +3,7 @@ class Movie < ActiveRecord::Base
     %w(G PG PG-13 NC-17 R)
   end
   
-  def self.similar_movies id
-    director = Movie.find(id).director
-    return nil if director.nil?
-    Movie.where(director: director)
+  def samedirector
+    Movie.where(:director => director) if (not director.nil?) and (not director.empty?)
   end
 end
