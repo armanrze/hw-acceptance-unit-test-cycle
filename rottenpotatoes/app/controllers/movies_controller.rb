@@ -17,8 +17,6 @@ class MoviesController < ApplicationController
       ordering,@title_header = {:title => :asc}, 'hilite'
     when 'release_date'
       ordering,@date_header = {:release_date => :asc}, 'hilite'
-    when 'director'
-      ordering,@director_header = {:director => :asc}, 'hilite'
     end
     @all_ratings = Movie.all_ratings
     @selected_ratings = params[:ratings] || session[:ratings] || {}
@@ -62,21 +60,13 @@ class MoviesController < ApplicationController
     flash[:notice] = "Movie '#{@movie.title}' deleted."
     redirect_to movies_path
   end
-  
-  def same_director
+
+  def find_similar_movies
+    @movies = Movie.similar_movies(params[:id].to_i)
     @movie = Movie.find(params[:id])
-    
-    if @movie.director == nil || @movie.director == ""
-      flash[:notice] = "\'" + @movie.title + "\' has no director info"
-      redirect_to '/movies' and return
-    end
-    
-    @movies_with_same_director = @movie.movies_with_same_director
-    
-    if @movies_with_same_director.empty?
-      redirect_to '/movies' and return
-    end
-    
+      if @movies.nil? or @movie.director.empty?
+        flash[:warning ] = "'#{@movie.title}' has no director info" 
+      redirect_to root_path
+      end
   end
-  
 end
